@@ -50,13 +50,24 @@ class ViewController: UIViewController, UNUserNotificationCenterDelegate {
         
         let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
         center.add(request)
+        
+        let reminder = UNMutableNotificationContent()
+        reminder.title = "Reminder"
+        reminder.body = "every 24h"
+        reminder.categoryIdentifier = "reminder"
+        reminder.sound = .default
+        
+        let remindTrigger = UNTimeIntervalNotificationTrigger(timeInterval: 86400, repeats: true)
+        let remindRequest = UNNotificationRequest(identifier: UUID().uuidString, content: reminder, trigger: remindTrigger)
+        center.add(remindRequest)
     }
     
     func registerCategories() {
         let center = UNUserNotificationCenter.current()
         center.delegate = self
         let show = UNNotificationAction(identifier: "show", title: "Tell me more...", options: .foreground)
-        let category = UNNotificationCategory(identifier: "alarm", actions: [show], intentIdentifiers: [], options: [])
+        let reminder = UNNotificationAction(identifier: "reminder", title: "Reminder every 24h...", options: .foreground)
+        let category = UNNotificationCategory(identifier: "alarm", actions: [show, reminder], intentIdentifiers: [], options: [])
         center.setNotificationCategories([category])
     }
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -70,6 +81,8 @@ class ViewController: UIViewController, UNUserNotificationCenterDelegate {
                 print("Default identifier")
             case "show":
                 print("show more info...")
+            case "reminder":
+                print("remind every 24h")
             default:
                 break
             }
